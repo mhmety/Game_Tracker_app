@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "541321319697",
+    "project_id": "game-tracker-app-45648",
+    "storage_bucket": "game-tracker-app-45648.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:541321319697:android:ca7569d449ca7f59e4e8b0",
+        "android_client_info": {
+          "package_name": "com.example.game_tracker_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBIr6YG7vpc20JVc_PT-Un2N4NUDjJsNbk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
