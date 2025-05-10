@@ -2,23 +2,33 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/game.dart';
 
 class FirestoreService {
-  final gamesRef = FirebaseFirestore.instance.collection('games');
+  final CollectionReference gamesRef =
+  FirebaseFirestore.instance.collection('games');
 
-  Stream<List<Game>> getGames() {
-    return gamesRef.snapshots().map((snapshot) => snapshot.docs
-        .map((doc) => Game.fromMap(doc.id, doc.data()))
-        .toList());
+  // Firestore'a yeni oyun ekleme
+  Future<void> addGameFromRawg({
+    required String title,
+    required String description,
+    required List<String> genres,
+    required bool played,
+  }) async {
+    await gamesRef.add({
+      'title': title,
+      'description': description,
+      'genres': genres,
+      'played': played,
+      'createdAt': FieldValue.serverTimestamp(), // Tarih sıralama için
+    });
   }
 
-  Future<void> addGame(String title) async {
-    await gamesRef.add({'title': title, 'played': false});
-  }
+  // Firestore'dan oyunları çekme
+  Future<List<Game>> getGames() async {
+    final snapshot =
+    await gamesRef.orderBy('createdAt', descending: true).get();
 
-  Future<void> togglePlayed(Game game) async {
-    await gamesRef.doc(game.id).update({'played': !game.played});
-  }
-
-  Future<void> deleteGame(String id) async {
-    await gamesRef.doc(id).delete();
+    return snapshot.docs.map((doc) {
+      final data = doc.data() as Map<String, dynamic>;
+      return Game.fromMap(doc.id, data);
+    }).toList();
   }
 }
