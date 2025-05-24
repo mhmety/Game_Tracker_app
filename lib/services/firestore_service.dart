@@ -11,13 +11,19 @@ class FirestoreService {
     required String description,
     required List<String> genres,
     required bool played,
+    String? imageUrl,
+    double? rating,
+    int? releaseYear,
   }) async {
     await gamesRef.add({
       'title': title,
       'description': description,
       'genres': genres,
       'played': played,
-      'createdAt': FieldValue.serverTimestamp(), // Tarih sıralama için
+      'imageUrl': imageUrl,
+      'rating': rating,
+      'releaseYear': releaseYear,
+      'createdAt': FieldValue.serverTimestamp(),
     });
   }
 

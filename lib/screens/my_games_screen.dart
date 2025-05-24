@@ -23,16 +23,16 @@ class _MyGamesScreenState extends State<MyGamesScreen> {
     _loadGames();
   }
 
-  void _showEditDescriptionDialog(Game game) {
-    final controller = TextEditingController(text: game.description);
+  void _showEditUserNoteDialog(Game game) {
+    final controller = TextEditingController(text: game.userDescription);
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Açıklamayı Düzenle'),
+        title: const Text('Kendi Notun'),
         content: TextField(
           controller: controller,
           maxLines: 3,
-          decoration: const InputDecoration(hintText: 'Yeni açıklama'),
+          decoration: const InputDecoration(hintText: 'Kendi yorumunu gir'),
         ),
         actions: [
           TextButton(
@@ -41,14 +41,14 @@ class _MyGamesScreenState extends State<MyGamesScreen> {
           ),
           ElevatedButton(
             onPressed: () async {
-              final updatedDescription = controller.text.trim();
-              if (updatedDescription != game.description) {
+              final updatedNote = controller.text.trim();
+              if (updatedNote != game.userDescription) {
                 await FirebaseFirestore.instance
                     .collection('games')
                     .doc(game.id)
-                    .update({'description': updatedDescription});
+                    .update({'userNote': updatedNote});
                 setState(() {
-                  game.description = updatedDescription;
+                  game.userDescription = updatedNote;
                 });
               }
               Navigator.of(context).pop();
@@ -260,6 +260,19 @@ class _MyGamesScreenState extends State<MyGamesScreen> {
                 return GestureDetector(
                   onLongPress: () => _deleteGame(game), // Uzun basıldığında silme işlemi
                   child: ExpansionTile(
+                    leading: game.imageUrl != null && game.imageUrl!.isNotEmpty
+                        ? ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Image.network(
+                        game.imageUrl!,
+                        width: 50,
+                        height: 50,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) =>
+                        const Icon(Icons.broken_image),
+                      ),
+                    )
+                        : const Icon(Icons.image_not_supported),
                     title: Text(game.title),
                     subtitle: Text(game.genres.join(', ')),
                     trailing: IconButton(
@@ -303,14 +316,15 @@ class _MyGamesScreenState extends State<MyGamesScreen> {
                     ),
                     children: [
                       ListTile(
-                        title: const Text('Açıklama'),
-                        subtitle: Text(game.description.isNotEmpty
-                            ? game.description
-                            : 'Açıklama yok.'),
+                        subtitle: Text(
+                          game.userDescription?.isNotEmpty == true
+                              ? game.userDescription!
+                              : 'Henüz bir not eklenmemiş.',
+                        ),
                         trailing: IconButton(
-                          icon: const Icon(Icons.edit),
+                          icon: const Icon(Icons.edit_note),
                           onPressed: () {
-                            _showEditDescriptionDialog(game);
+                            _showEditUserNoteDialog(game);
                           },
                         ),
                       ),
