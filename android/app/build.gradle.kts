@@ -21,8 +21,8 @@ android {
 
     defaultConfig {
         applicationId = "com.example.game_tracker_app"  // Firebase ile uyumlu olmalı
-        minSdk = 21
-        targetSdk = 35  // En son SDK sürümü
+        minSdkVersion(23)
+        targetSdkVersion(35)  // En son SDK sürümü
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }

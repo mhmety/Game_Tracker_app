@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart'; // Firebase'i başlatmak için import
-import 'screens/main_tab_screen.dart'; // Ekranınızı import ediyoruz
+import 'package:firebase_core/firebase_core.dart';
+import 'screens/auth_screen.dart';
+import 'screens/main_tab_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized(); // Firebase'i başlatmadan önce bu fonksiyonu çağırmalıyız.
-
-
+  WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-
   runApp(const MyApp());
 }
 
@@ -17,13 +16,21 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
       title: 'Game Tracker',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(primarySwatch: Colors.deepPurple),
+      home: StreamBuilder<User?>(
+        stream: FirebaseAuth.instance.authStateChanges(),
+        builder: (ctx, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Scaffold(body: Center(child: CircularProgressIndicator()));
+          }
+          if (snapshot.hasData) {
+            return const MainTabScreen(); // Kullanıcı giriş yaptıysa
+          }
+          return const AuthScreen(); // Giriş ekranı
+        },
       ),
-      home: const MainTabScreen(),
     );
   }
 }

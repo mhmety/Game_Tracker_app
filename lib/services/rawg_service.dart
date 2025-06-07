@@ -1,58 +1,96 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:game_tracker/models/game.dart';
+import '../models/game.dart';
 
 class RawgService {
-  static const String apiKey = '3943be01282741bb89747b01605aabce';
-  static const String apiUrl = 'https://api.rawg.io/api/games';
+  final String apiKey = '3943be01282741bb89747b01605aabce';
 
-  // Arama yap ve temel oyun bilgilerini döndür
-  Future<List<Game>> fetchGames(String query) async {
-    final response = await http.get(
-      Uri.parse('$apiUrl?key=$apiKey&page_size=10&search=$query'),
+  Future<List<Game>> fetchGames(String genre, {int page = 1}) async {
+    final url = Uri.parse(
+      'https://api.rawg.io/api/games?genres=$genre&page=$page&page_size=20&key=$apiKey',
     );
+    return _fetchAndParseGames(url);
+  }
 
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      final List games = data['results'];
+  Future<List<Game>> searchGames(String query, {int page = 1}) async {
+    final url = Uri.parse(
+      'https://api.rawg.io/api/games?search=$query&page=$page&page_size=20&key=$apiKey',
+    );
+    return _fetchAndParseGames(url);
+  }
 
-      return Future.wait(games.map((game) async {
-        final List<dynamic>? genreList = game['genres'];
-        final genres = genreList != null
-            ? genreList.map((g) => g['name'].toString()).toList()
-            : <String>[];
+  Future<List<Game>> fetchNewestGames({int page = 1}) async {
+    final url = Uri.parse(
+      'https://api.rawg.io/api/games?ordering=-released&page=$page&page_size=20&key=$apiKey',
+    );
+    return _fetchAndParseGames(url);
+  }
 
-        // Detay verisini al (açıklama için)
-        final gameDetails = await fetchGameDetails(game['id']);
+  Future<List<Game>> fetchPopularGames({int page = 1}) async {
+    final url = Uri.parse(
+      'https://api.rawg.io/api/games?ordering=-rating&page=$page&page_size=20&key=$apiKey',
+    );
+    return _fetchAndParseGames(url);
+  }
 
-        return Game(
-          title: game['name'] ?? 'No title',
-          description: gameDetails['description_raw'] ?? 'Açıklama bulunamadı',
-          genres: genres,
-          played: false, // Kullanıcıya özel: başlangıçta false
-          imageUrl: game['background_image'],
-          rating: game['rating']?.toDouble(),
-          releaseYear: game['released'] != null
-              ? DateTime.tryParse(game['released'])?.year
-              : null,
-          userDescription: null, // Kullanıcıya özel: veritabanında tutulmalı
-        );
-      }).toList());
-    } else {
-      throw Exception('Failed to load games');
+  Future<List<Game>> _fetchAndParseGames(Uri url) async {
+    try {
+      final response = await http.get(url).timeout(const Duration(seconds: 10));
+
+      if (response.statusCode == 200) {
+        final List results = json.decode(response.body)['results'];
+        return results.map((raw) {
+          return Game(
+            id: raw['id'].toString(),
+            title: raw['name'] ?? 'Unknown',
+            description: '', // 🔴 Detayda ayrı alınacak
+            played: false,
+            genres: (raw['genres'] as List<dynamic>?)
+                ?.map((g) => g['name'].toString())
+                .toList() ??
+                [],
+            imageUrl: raw['background_image'],
+            rating: (raw['rating'] as num?)?.toDouble(),
+            released: raw['released'],
+          );
+        }).toList();
+      } else {
+        throw Exception('Failed to fetch games: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Error fetching games: $e');
     }
   }
 
-  // Oyun detaylarını getir (özellikle açıklama için)
-  Future<Map<String, dynamic>> fetchGameDetails(int gameId) async {
-    final response = await http.get(
-      Uri.parse('$apiUrl/$gameId?key=$apiKey'),
+  /// ✅ Detaylı açıklama, sistem bilgileri, geliştirici vs. almak için
+  Future<Game> fetchGameDetails(String id) async {
+    final url = Uri.parse(
+      'https://api.rawg.io/api/games/$id?key=$apiKey',
     );
 
-    if (response.statusCode == 200) {
-      return json.decode(response.body);
-    } else {
-      return {}; // Açıklama yoksa boş dön
+    try {
+      final response = await http.get(url).timeout(const Duration(seconds: 10));
+
+      if (response.statusCode == 200) {
+        final raw = json.decode(response.body);
+        return Game(
+          id: raw['id'].toString(),
+          title: raw['name'] ?? 'Unknown',
+          description: raw['description'] ?? '',
+          played: false,
+          genres: (raw['genres'] as List<dynamic>?)
+              ?.map((g) => g['name'].toString())
+              .toList() ??
+              [],
+          imageUrl: raw['background_image'],
+          rating: (raw['rating'] as num?)?.toDouble(),
+          released: raw['released'],
+        );
+      } else {
+        throw Exception('Failed to fetch game details: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Error fetching game details: $e');
     }
   }
 }
