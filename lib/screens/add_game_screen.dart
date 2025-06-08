@@ -42,7 +42,7 @@ class _AddGameScreenState extends State<AddGameScreen> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    "Oyun Durumu",
+                    "Game Status",
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -51,7 +51,7 @@ class _AddGameScreenState extends State<AddGameScreen> {
                   ),
                   const SizedBox(height: 10),
                   RadioListTile<bool>(
-                    title: const Text("Oynanacak", style: TextStyle(color: Colors.white)),
+                    title: const Text("To Play", style: TextStyle(color: Colors.white)),
                     value: false,
                     groupValue: _played,
                     activeColor: turquoise,
@@ -61,7 +61,7 @@ class _AddGameScreenState extends State<AddGameScreen> {
                     },
                   ),
                   RadioListTile<bool>(
-                    title: const Text("Oynandı", style: TextStyle(color: Colors.white)),
+                    title: const Text("Played", style: TextStyle(color: Colors.white)),
                     value: true,
                     groupValue: _played,
                     activeColor: turquoise,
@@ -74,7 +74,7 @@ class _AddGameScreenState extends State<AddGameScreen> {
                   ElevatedButton.icon(
                     onPressed: _saveGame,
                     icon: Icon(Icons.check, color: lightTurquoise),
-                    label: const Text("Oyun Ekle", style: TextStyle(color: Colors.white)),
+                    label: const Text("Add Game", style: TextStyle(color: Colors.white)),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: turquoise,
                       shape: RoundedRectangleBorder(
@@ -93,12 +93,12 @@ class _AddGameScreenState extends State<AddGameScreen> {
   }
 
   Future<void> _saveGame() async {
-    Navigator.of(context).pop(); // BottomSheet'i kapat
+    Navigator.of(context).pop();
 
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Giriş yapmanız gerekiyor.')),
+        const SnackBar(content: Text('You need to log in.')),
       );
       return;
     }
@@ -134,11 +134,11 @@ class _AddGameScreenState extends State<AddGameScreen> {
         releaseYear: game.releaseYear,
       );
 
-      Navigator.of(context).pop(); // Loading dialog'u kapat
+      Navigator.of(context).pop();
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Oyun başarıyla eklendi!'),
+          content: Text('Game added successfully!'),
           duration: Duration(seconds: 2),
           behavior: SnackBarBehavior.floating,
         ),
@@ -149,9 +149,9 @@ class _AddGameScreenState extends State<AddGameScreen> {
             (route) => false,
       );
     } catch (e) {
-      Navigator.of(context).pop(); // Loading kapat
+      Navigator.of(context).pop();
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Hata: $e')),
+        SnackBar(content: Text('Error: $e')),
       );
     }
   }
@@ -163,7 +163,7 @@ class _AddGameScreenState extends State<AddGameScreen> {
     return Scaffold(
       backgroundColor: darkBlue,
       appBar: AppBar(
-        title: const Text('Oyun Detayı', style: TextStyle(color: Colors.white)),
+        title: const Text('Game Details', style: TextStyle(color: Colors.white)),
         backgroundColor: darkBlue,
         iconTheme: const IconThemeData(color: Colors.white),
       ),
@@ -196,12 +196,12 @@ class _AddGameScreenState extends State<AddGameScreen> {
             const SizedBox(height: 8),
             if (game.rating != null)
               Text(
-                'Puan: ${game.rating!.toStringAsFixed(1)}',
+                'Rating: ${game.rating!.toStringAsFixed(1)}',
                 style: const TextStyle(color: Colors.white),
               ),
             if (game.releaseYear != null)
               Text(
-                'Çıkış Yılı: ${game.releaseYear}',
+                'Release Year: ${game.releaseYear}',
                 style: const TextStyle(color: Colors.white),
               ),
             const SizedBox(height: 8),
@@ -222,7 +222,7 @@ class _AddGameScreenState extends State<AddGameScreen> {
               ),
             const SizedBox(height: 16),
             const Text(
-              'Açıklama',
+              'Description',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
@@ -231,7 +231,7 @@ class _AddGameScreenState extends State<AddGameScreen> {
             ),
             const SizedBox(height: 8),
             Text(
-              game.description.isNotEmpty ? game.description : 'Açıklama bulunamadı.',
+              game.description.isNotEmpty ? game.description : 'No description available.',
               style: const TextStyle(fontSize: 14, color: Colors.white),
               maxLines: 10,
               overflow: TextOverflow.ellipsis,
@@ -245,7 +245,7 @@ class _AddGameScreenState extends State<AddGameScreen> {
           child: ElevatedButton.icon(
             onPressed: _openBottomSheet,
             icon: Icon(Icons.add, color: lightTurquoise),
-            label: const Text('Ekle', style: TextStyle(color: Colors.white)),
+            label: const Text('Add', style: TextStyle(color: Colors.white)),
             style: ElevatedButton.styleFrom(
               backgroundColor: turquoise,
               minimumSize: const Size.fromHeight(50),

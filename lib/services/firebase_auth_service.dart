@@ -12,7 +12,7 @@ class FirebaseAuthService {
       );
       return userCredential.user;
     } catch (e) {
-      print('Kayıt olma hatası: $e');
+      print('registration error: $e');
       return null;
     }
   }
@@ -26,7 +26,7 @@ class FirebaseAuthService {
       );
       return userCredential.user;
     } catch (e) {
-      print('Giriş hatası: $e');
+      print('Login Error: $e');
       return null;
     }
   }

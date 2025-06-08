@@ -16,7 +16,7 @@ class _MyGamesScreenState extends State<MyGamesScreen> {
   List<Game> _filteredGames = [];
   bool _isLoading = true;
   String _searchQuery = '';
-  String _filter = 'Tümü';
+  String _filter = 'All';
 
   final Color backgroundColor = const Color(0xFF071952);
   final Color cardColor = const Color(0xFF088395);
@@ -46,7 +46,7 @@ class _MyGamesScreenState extends State<MyGamesScreen> {
     } catch (e) {
       setState(() => _isLoading = false);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Oyunlar alınamadı: $e')),
+        SnackBar(content: Text('Failed to fetch games: $e')),
       );
     }
   }
@@ -54,9 +54,9 @@ class _MyGamesScreenState extends State<MyGamesScreen> {
   void _applyFilters() {
     List<Game> filtered = _allGames;
 
-    if (_filter == 'Oynandı') {
+    if (_filter == 'Played') {
       filtered = filtered.where((g) => g.played).toList();
-    } else if (_filter == 'Oynanacak') {
+    } else if (_filter == 'To Play') {
       filtered = filtered.where((g) => !g.played).toList();
     }
 
@@ -83,7 +83,7 @@ class _MyGamesScreenState extends State<MyGamesScreen> {
       });
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Durum güncellenemedi: $e')),
+        SnackBar(content: Text('Failed to update status: $e')),
       );
     }
   }
@@ -93,16 +93,16 @@ class _MyGamesScreenState extends State<MyGamesScreen> {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: cardColor,
-        title: Text('Silmek istediğinizden emin misiniz?', style: TextStyle(color: textColor)),
-        content: Text('Bu işlem geri alınamaz.', style: TextStyle(color: textColor)),
+        title: Text('Are you sure you want to delete?', style: TextStyle(color: textColor)),
+        content: Text('This action cannot be undone.', style: TextStyle(color: textColor)),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('İptal', style: TextStyle(color: Colors.white)),
+            child: const Text('Cancel', style: TextStyle(color: Colors.white)),
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: Text('Evet', style: TextStyle(color: accentColor)),
+            child: Text('Yes', style: TextStyle(color: accentColor)),
           ),
         ],
       ),
@@ -116,11 +116,11 @@ class _MyGamesScreenState extends State<MyGamesScreen> {
           _applyFilters();
         });
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Oyun başarıyla silindi.')),
+          const SnackBar(content: Text('Game deleted successfully.')),
         );
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Oyun silinemedi: $e')),
+          SnackBar(content: Text('Failed to delete game: $e')),
         );
       }
     }
@@ -133,6 +133,7 @@ class _MyGamesScreenState extends State<MyGamesScreen> {
       appBar: AppBar(
         backgroundColor: cardColor,
         title: const Text('My Games'),
+        centerTitle: true,
         foregroundColor: textColor,
       ),
       body: _isLoading
@@ -144,7 +145,7 @@ class _MyGamesScreenState extends State<MyGamesScreen> {
             child: TextField(
               controller: _searchController,
               decoration: InputDecoration(
-                hintText: 'Oyun ara...',
+                hintText: 'Search games...',
                 hintStyle: TextStyle(color: textColor.withOpacity(0.6)),
                 prefixIcon: Icon(Icons.search, color: textColor),
                 filled: true,
@@ -165,7 +166,7 @@ class _MyGamesScreenState extends State<MyGamesScreen> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8),
             child: Row(
-              children: ['Tümü', 'Oynandı', 'Oynanacak'].map((label) {
+              children: ['All', 'Played', 'To Play'].map((label) {
                 return Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 4),
                   child: FilterChip(
@@ -223,11 +224,13 @@ class _MyGamesScreenState extends State<MyGamesScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               TextField(
-                                controller: TextEditingController(text: game.userDescription),
+                                controller:
+                                TextEditingController(text: game.userDescription),
                                 maxLines: 3,
                                 decoration: InputDecoration(
-                                  hintText: 'Kendi notunu gir',
-                                  hintStyle: TextStyle(color: textColor.withOpacity(0.6)),
+                                  hintText: 'Enter your note',
+                                  hintStyle:
+                                  TextStyle(color: textColor.withOpacity(0.6)),
                                   filled: true,
                                   fillColor: backgroundColor,
                                   border: const OutlineInputBorder(),
@@ -250,7 +253,7 @@ class _MyGamesScreenState extends State<MyGamesScreen> {
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text('Oynandı mı?', style: TextStyle(color: textColor)),
+                                  Text('Played?', style: TextStyle(color: textColor)),
                                   Switch(
                                     value: game.played,
                                     onChanged: (val) => _togglePlayed(game, val),

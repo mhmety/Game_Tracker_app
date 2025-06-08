@@ -23,7 +23,7 @@ class _AuthScreenState extends State<AuthScreen> {
         );
 
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Giriş başarılı!')),
+          const SnackBar(content: Text('Login Succesfully!')),
         );
       } else {
         await FirebaseAuth.instance.createUserWithEmailAndPassword(
@@ -32,7 +32,7 @@ class _AuthScreenState extends State<AuthScreen> {
         );
 
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Kayıt başarılı! Giriş sayfasına yönlendiriliyorsunuz.')),
+          const SnackBar(content: Text('Registration successful! You are redirected to the login page.')),
         );
 
         setState(() => _isLogin = true);
@@ -45,7 +45,7 @@ class _AuthScreenState extends State<AuthScreen> {
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Hata: ${e.toString()}')),
+        SnackBar(content: Text('Error: ${e.toString()}')),
       );
     }
   }
@@ -60,7 +60,7 @@ class _AuthScreenState extends State<AuthScreen> {
       backgroundColor: backgroundColor,
       appBar: AppBar(
         backgroundColor: cardColor,
-        title: Text(_isLogin ? 'Giriş Yap' : 'Kayıt Ol', style: whiteText),
+        title: Text(_isLogin ? 'Login' : 'Register', style: whiteText),
       ),
       body: Padding(
         padding: const EdgeInsets.all(24),
@@ -87,7 +87,8 @@ class _AuthScreenState extends State<AuthScreen> {
               obscureText: true,
               style: const TextStyle(color: Colors.white),
               decoration: InputDecoration(
-                labelText: 'Şifre',
+                labelText: ''
+                    'Password',
                 labelStyle: const TextStyle(color: Colors.white70),
                 enabledBorder: const OutlineInputBorder(
                   borderSide: BorderSide(color: Colors.white70),
@@ -105,14 +106,14 @@ class _AuthScreenState extends State<AuthScreen> {
               ),
               onPressed: _submit,
               child: Text(
-                _isLogin ? 'Giriş Yap' : 'Kayıt Ol',
+                _isLogin ? 'Login' : 'Register',
                 style: whiteText,
               ),
             ),
             TextButton(
               onPressed: () => setState(() => _isLogin = !_isLogin),
               child: Text(
-                _isLogin ? 'Hesabın yok mu? Kayıt ol' : 'Zaten hesabın var mı? Giriş yap',
+                _isLogin ? "Don't have an account? Register" : 'Already have an account? Login',
                 style: const TextStyle(color: Colors.white70),
               ),
             ),
